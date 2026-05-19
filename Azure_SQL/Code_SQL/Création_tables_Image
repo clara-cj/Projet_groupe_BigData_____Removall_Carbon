@@ -1,0 +1,6 @@
+-- Creation de notre Table Photos dans Azure SQL pour y mettre les images via Blob
+
+CREATE TABLE Photos (
+    id_photo            INT IDENTITY PRIMARY KEY,
+    blob_url            NVARCHAR(1000),   # correspond à File URL
+);

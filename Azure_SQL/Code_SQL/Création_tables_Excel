@@ -1,0 +1,164 @@
+-- Creation de nos Tables SQL par rapport à nos colonnes d'Excel
+
+CREATE TABLE VILLAGE (					
+    village_name  NVARCHAR(150) PRIMARY KEY,					
+    district      NVARCHAR(100) NULL,					
+    province      NVARCHAR(100) NULL,					
+    ward          NVARCHAR(100) NULL					
+);					
+					
+CREATE TABLE BOREHOLE (					
+    co2_id                      NVARCHAR(50)   PRIMARY KEY,					
+    village_name                NVARCHAR(150)  NULL,					
+    province                    NVARCHAR(100)  NULL,					
+    district                    NVARCHAR(100)  NULL,					
+    ward                        NVARCHAR(100)  NULL,					
+    gps_lat                     DECIMAL(9,6)   NULL,					
+    gps_lon                     DECIMAL(9,6)   NULL,					
+    elevation_ft                DECIMAL(8,2)   NULL,					
+    estimated_year_construction SMALLINT       NULL,					
+    well_depth                  DECIMAL(8,2)   NULL,					
+    depth_from_surface          DECIMAL(8,2)   NULL,					
+    apron                       NVARCHAR(50)   NULL,					
+    previous_water_source       NVARCHAR(200)  NULL,					
+    publicly_owned              BIT            NULL,					
+    exp_seasons_without_water   BIT            NULL,					
+    installed_before_2010       BIT            NULL,					
+    no_households               INT            NULL,					
+    improved_water_source_2km   BIT            NULL,					
+    date_first_visit            DATE           NULL,					
+    near_swamp                  BIT            NULL,					
+    power_line                  BIT            NULL,					
+    estimated_population        INT            NULL,					
+    CONSTRAINT FK_BOREHOLE_VILLAGE					
+        FOREIGN KEY (village_name) REFERENCES VILLAGE(village_name)					
+);					
+					
+CREATE TABLE SENSOR (					
+    sensor_id            INT           PRIMARY KEY IDENTITY(1,1),					
+    co2_id               NVARCHAR(50)  NOT NULL,					
+    sensor_serial        NVARCHAR(100) NULL,					
+    installation_date    DATE          NULL,					
+    type_of_meter        NVARCHAR(100) NULL,					
+    strokes_to_fill_20l  INT           NULL,					
+    needles_turning      BIT           NULL,					
+    grouped_round        NVARCHAR(50)  NULL,					
+    CONSTRAINT FK_SENSOR_BOREHOLE					
+        FOREIGN KEY (co2_id) REFERENCES BOREHOLE(co2_id)					
+);					
+					
+CREATE TABLE METER_READING (					
+    reading_id                  INT           PRIMARY KEY IDENTITY(1,1),					
+    co2_id                      NVARCHAR(50)  NOT NULL,					
+    date_of_reading             DATE          NULL,					
+    meter_reading               DECIMAL(12,3) NULL,					
+    total_water_usage_m3        DECIMAL(12,3) NULL,					
+    litres_per_person_per_day   DECIMAL(8,2)  NULL,					
+    in_person_reading           BIT           NULL,					
+    problem_with_meter          BIT           NULL,					
+    problem_description         NVARCHAR(500) NULL,					
+    latest_ul_total_pop         INT           NULL,					
+    days_since_installation     INT           NULL,					
+    collecting_drinking_only    BIT           NULL,					
+    school_or_institution       BIT           NULL,					
+    restricts_access            BIT           NULL,					
+    closing_time                NVARCHAR(20)  NULL,					
+    CONSTRAINT FK_METER_BOREHOLE					
+        FOREIGN KEY (co2_id) REFERENCES BOREHOLE(co2_id)					
+);					
+					
+CREATE TABLE USERLIST (					
+    userlist_id              INT           PRIMARY KEY IDENTITY(1,1),					
+    co2_id                   NVARCHAR(50)  NOT NULL,					
+    village_name             NVARCHAR(150) NULL,					
+    district                 NVARCHAR(100) NULL,					
+    type                     NVARCHAR(50)  NULL,					
+    date_of_visit            DATE          NULL,					
+    household_id             NVARCHAR(100) NULL,					
+    households_name          NVARCHAR(200) NULL,					
+    total_people             INT           NULL,					
+    num_children             INT           NULL,					
+    num_men                  INT           NULL,					
+    num_women                INT           NULL,					
+    cell_phone               NVARCHAR(30)  NULL,					
+    distance_from_borehole_m DECIMAL(8,1)  NULL,					
+    distance_over_1000m      BIT           NULL,					
+    borehole_round           NVARCHAR(50)  NULL,					
+    CONSTRAINT FK_USERLIST_BOREHOLE					
+        FOREIGN KEY (co2_id) REFERENCES BOREHOLE(co2_id)					
+);					
+					
+CREATE TABLE COMMUNITY_VISIT (					
+    visit_id                        INT           PRIMARY KEY IDENTITY(1,1),					
+    co2_id                          NVARCHAR(50)  NOT NULL,					
+    type                            NVARCHAR(50)  NULL,					
+    date_of_visit                   DATE          NULL,					
+    grouped_round                   NVARCHAR(50)  NULL,					
+    problem_with_pump               BIT           NULL,					
+    pump_producing_water            BIT           NULL,					
+    days_water_not_available        INT           NULL,					
+    constant_water                  BIT           NULL,					
+    reason_not_constant             NVARCHAR(300) NULL,					
+    open_close_time                 NVARCHAR(50)  NULL,					
+    strokes_before_water            INT           NULL,					
+    pump_efficiency                 NVARCHAR(50)  NULL,					
+    within_optimal_range            BIT           NULL,					
+    repaired_by_community_past_4mo  BIT           NULL,					
+    taste_acceptable                BIT           NULL,					
+    color_normal                    BIT           NULL,					
+    increase_in_illness             BIT           NULL,					
+    borehole_surroundings           NVARCHAR(200) NULL,					
+    minor_problems                  NVARCHAR(500) NULL,					
+    count_rectifications            INT           NULL,					
+    CONSTRAINT FK_VISIT_BOREHOLE					
+        FOREIGN KEY (co2_id) REFERENCES BOREHOLE(co2_id)					
+);					
+					
+CREATE TABLE MAINTENANCE (					
+    maintenance_id          INT           PRIMARY KEY IDENTITY(1,1),					
+    co2_id                  NVARCHAR(50)  NOT NULL,					
+    village_name            NVARCHAR(150) NULL,					
+    date_first_broke_down   DATE          NULL,					
+    end_date                DATE          NULL,					
+    completion_date         DATE          NULL,					
+    created_date            DATE          NULL,					
+    days_broken             INT           NULL,					
+    works_required          NVARCHAR(500) NULL,					
+    work_completed          NVARCHAR(500) NULL,					
+    work_completed_by       NVARCHAR(200) NULL,					
+    was_pump_producing      BIT           NULL,					
+    grouped_round           NVARCHAR(50)  NULL,					
+    re_repair               BIT           NULL,					
+    rectifications          NVARCHAR(500) NULL,					
+    local_partner           NVARCHAR(200) NULL,					
+    source                  NVARCHAR(50)  NULL,					
+    CONSTRAINT FK_MAINT_BOREHOLE					
+        FOREIGN KEY (co2_id) REFERENCES BOREHOLE(co2_id)					
+);					
+					
+CREATE TABLE REPAIR_PART (					
+    part_id          INT           PRIMARY KEY IDENTITY(1,1),					
+    maintenance_id   INT           NULL,					
+    co2_id           NVARCHAR(50)  NOT NULL,					
+    village_name     NVARCHAR(150) NULL,					
+    repair_date      DATE          NULL,					
+    repairs_name     NVARCHAR(200) NULL,					
+    quantity         INT           NULL,					
+    repairs_needed   NVARCHAR(500) NULL,					
+    other_part       NVARCHAR(200) NULL,					
+    re_repair        BIT           NULL,					
+    local_partner    NVARCHAR(200) NULL,					
+    CONSTRAINT FK_PART_BOREHOLE					
+        FOREIGN KEY (co2_id) REFERENCES BOREHOLE(co2_id),					
+    CONSTRAINT FK_PART_MAINTENANCE					
+        FOREIGN KEY (maintenance_id) REFERENCES MAINTENANCE(maintenance_id)					
+);					
+					
+CREATE TABLE QA_LOG (					
+    log_id      INT            PRIMARY KEY IDENTITY(1,1),					
+    co2_id      NVARCHAR(50)   NULL,					
+    checked_at  DATETIME       DEFAULT GETDATE(),					
+    check_type  NVARCHAR(100)  NOT NULL,					
+    status      NVARCHAR(20)   NOT NULL CHECK(status IN ('OK', 'WARNING', 'ERROR')),					
+    message     NVARCHAR(1000) NULL					
+);					
